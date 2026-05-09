@@ -490,7 +490,7 @@ a { color: inherit; text-decoration: none; }
   direction: ltr;
   display: flex;
   width: max-content;
-  animation: scroll-x 40s linear infinite;
+  animation: scroll-x var(--marquee-dur, 40s) linear infinite;
   font-family: "Fredoka", "Heebo", sans-serif;
   font-weight: 700;
   font-size: 1.6rem;
@@ -498,18 +498,16 @@ a { color: inherit; text-decoration: none; }
   text-shadow: 2px 3px 0 rgba(0, 0, 0, 0.15);
   will-change: transform;
 }
-.marquee-set {
+.marquee-half {
   display: flex;
   align-items: center;
-  justify-content: space-around;
-  gap: 40px;
+  gap: 50px;
+  padding-right: 50px;
   flex-shrink: 0;
   white-space: nowrap;
-  min-width: 100vw;
-  padding: 0 20px;
 }
-.marquee-set span,
-.marquee-set i {
+.marquee-half span,
+.marquee-half i {
   display: inline-block;
   unicode-bidi: isolate;
 }

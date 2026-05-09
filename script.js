@@ -144,6 +144,49 @@ document.querySelectorAll('.mode-btn').forEach(btn => {
 });
 applyMode();
 
+// ===== Marquee: clone halves until track is wide enough for seamless loop =====
+function buildMarquee() {
+  const track = document.getElementById('marqueeTrack');
+  const firstHalf = document.getElementById('marqueeHalf');
+  if (!track || !firstHalf) return;
+
+  // Remove any clones from a previous build (keep the original first half).
+  Array.from(track.children).forEach((c, i) => { if (i > 0) c.remove(); });
+
+  const halfWidth = firstHalf.getBoundingClientRect().width;
+  const vw = window.innerWidth;
+  if (halfWidth <= 0) return;
+
+  // We need each half to span at least one viewport so translateX(-50%)
+  // shifts by ≥100vw. Add items to the first half until it's ≥ 1.1*vw.
+  const items = Array.from(firstHalf.children).map(n => n.cloneNode(true));
+  let safety = 0;
+  while (firstHalf.getBoundingClientRect().width < vw * 1.1 && safety < 40) {
+    items.forEach(n => firstHalf.appendChild(n.cloneNode(true)));
+    safety++;
+  }
+
+  // Now duplicate the entire first half once, so total = exactly 2 halves.
+  const clone = firstHalf.cloneNode(true);
+  clone.removeAttribute('id');
+  clone.setAttribute('aria-hidden', 'true');
+  track.appendChild(clone);
+
+  // Tie animation duration to width so scroll speed feels consistent.
+  const finalHalfPx = firstHalf.getBoundingClientRect().width;
+  const dur = Math.max(20, Math.round(finalHalfPx / 80)); // ~80px/sec
+  track.style.setProperty('--marquee-dur', dur + 's');
+}
+buildMarquee();
+let mqResizeRaf = 0;
+window.addEventListener('resize', () => {
+  if (mqResizeRaf) return;
+  mqResizeRaf = requestAnimationFrame(() => {
+    mqResizeRaf = 0;
+    buildMarquee();
+  });
+});
+
 // ===== Sticky mini-bar =====
 const miniBar = document.getElementById('miniBar');
 window.addEventListener('scroll', () => {
