@@ -335,65 +335,133 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && emojiPicker && !emojiPicker.hidden) closeEmojiPicker();
 });
 
-// ===== Bye section: user-added cards =====
-const BYE_KEY = 'chofesh-bye-extras';
+// ===== Bye section: shared community cards via Worker API =====
+const BYE_API = 'https://chofesh-gadol-api.liamonaaa.workers.dev/items';
+const BYE_CACHE_KEY = 'chofesh-bye-cache';
+const BYE_MINE_KEY = 'chofesh-bye-mine'; // ids the current user added (so they can delete their own)
 const byeGrid = document.getElementById('byeGrid');
 const byeForm = document.getElementById('byeAddForm');
 const byeIconInput = document.getElementById('byeIcon');
 const byeTextInput = document.getElementById('byeText');
+const byeAddBtn = byeForm ? byeForm.querySelector('.bye-add-btn') : null;
 
-function loadByeExtras() {
-  try { return JSON.parse(localStorage.getItem(BYE_KEY)) || []; }
-  catch { return []; }
-}
-function saveByeExtras(list) {
-  localStorage.setItem(BYE_KEY, JSON.stringify(list));
-}
-function renderByeExtras() {
-  if (!byeGrid) return;
-  // Drop any existing user cards.
-  byeGrid.querySelectorAll('.bye-card.user').forEach(n => n.remove());
-  const list = loadByeExtras();
-  list.forEach(item => {
-    const card = document.createElement('div');
-    card.className = 'bye-card user';
-    card.dataset.id = item.id;
-    card.innerHTML = `
-      <button class="bye-remove" type="button" aria-label="הסר">✕</button>
-      <span class="bye-x">✕</span>
-      <span class="bye-icon">${escapeHtml(item.icon || '✨')}</span>
-      <span class="bye-text">${escapeHtml(item.text)}</span>
-    `;
-    card.querySelector('.bye-remove').addEventListener('click', () => {
-      const next = loadByeExtras().filter(x => x.id !== item.id);
-      saveByeExtras(next);
-      renderByeExtras();
-    });
-    byeGrid.appendChild(card);
-  });
-}
 function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, c => ({
     '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
   }[c]));
 }
+
+function loadCache() {
+  try { return JSON.parse(localStorage.getItem(BYE_CACHE_KEY)) || []; }
+  catch { return []; }
+}
+function saveCache(list) {
+  try { localStorage.setItem(BYE_CACHE_KEY, JSON.stringify(list)); } catch {}
+}
+function loadMine() {
+  try { return new Set(JSON.parse(localStorage.getItem(BYE_MINE_KEY)) || []); }
+  catch { return new Set(); }
+}
+function saveMine(set) {
+  try { localStorage.setItem(BYE_MINE_KEY, JSON.stringify([...set])); } catch {}
+}
+
+async function fetchItems() {
+  const res = await fetch(BYE_API, { method: 'GET' });
+  if (!res.ok) throw new Error('GET failed: ' + res.status);
+  const data = await res.json();
+  return Array.isArray(data.items) ? data.items : [];
+}
+async function postItem(icon, text) {
+  const res = await fetch(BYE_API, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ icon, text }),
+  });
+  if (!res.ok) throw new Error('POST failed: ' + res.status);
+  return (await res.json()).item;
+}
+async function deleteItem(id) {
+  const res = await fetch(BYE_API + '/' + encodeURIComponent(id), { method: 'DELETE' });
+  if (!res.ok) throw new Error('DELETE failed: ' + res.status);
+  return true;
+}
+
+function renderByeExtras(list) {
+  if (!byeGrid) return;
+  byeGrid.querySelectorAll('.bye-card.user').forEach(n => n.remove());
+  const mine = loadMine();
+  list.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'bye-card user';
+    card.dataset.id = item.id;
+    const isMine = mine.has(item.id);
+    card.innerHTML = `
+      ${isMine ? '<button class="bye-remove" type="button" aria-label="הסר">✕</button>' : ''}
+      <span class="bye-x">✕</span>
+      <span class="bye-icon">${escapeHtml(item.icon || '✨')}</span>
+      <span class="bye-text">${escapeHtml(item.text)}</span>
+    `;
+    const rm = card.querySelector('.bye-remove');
+    if (rm) {
+      rm.addEventListener('click', async () => {
+        rm.disabled = true;
+        try {
+          await deleteItem(item.id);
+          const next = mine; next.delete(item.id); saveMine(next);
+          await refreshByeFromServer();
+        } catch (err) {
+          rm.disabled = false;
+          console.warn('delete failed', err);
+        }
+      });
+    }
+    byeGrid.appendChild(card);
+  });
+}
+
+async function refreshByeFromServer() {
+  try {
+    const items = await fetchItems();
+    saveCache(items);
+    renderByeExtras(items);
+  } catch (err) {
+    console.warn('fetch failed, using cache', err);
+  }
+}
+
+// Initial paint: cached data instantly, then live data when ready.
+renderByeExtras(loadCache());
+refreshByeFromServer();
+
+// Poll for new items so other visitors' adds show up live.
+setInterval(refreshByeFromServer, 12000);
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) refreshByeFromServer();
+});
+
 if (byeForm) {
-  byeForm.addEventListener('submit', (e) => {
+  byeForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const text = (byeTextInput.value || '').trim();
     if (!text) return;
     const icon = (byeIconInput.value || '').trim() || '✨';
-    // Reset trigger button visual to placeholder for next add.
-    if (emojiBtn) emojiBtn.textContent = '🙃';
-    const list = loadByeExtras();
-    list.push({ id: Date.now() + '-' + Math.random().toString(36).slice(2, 7), icon, text });
-    saveByeExtras(list);
-    byeIconInput.value = '';
-    byeTextInput.value = '';
-    renderByeExtras();
+    if (byeAddBtn) byeAddBtn.disabled = true;
+    try {
+      const item = await postItem(icon, text);
+      const mine = loadMine(); mine.add(item.id); saveMine(mine);
+      byeIconInput.value = '';
+      byeTextInput.value = '';
+      if (typeof emojiBtn !== 'undefined' && emojiBtn) emojiBtn.textContent = '🙃';
+      await refreshByeFromServer();
+    } catch (err) {
+      console.warn('add failed', err);
+      alert('שגיאה בהוספה. נסה שוב בעוד רגע.');
+    } finally {
+      if (byeAddBtn) byeAddBtn.disabled = false;
+    }
   });
 }
-renderByeExtras();
 
 // ===== Sticky mini-bar =====
 const miniBar = document.getElementById('miniBar');
