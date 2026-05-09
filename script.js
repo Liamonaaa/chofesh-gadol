@@ -144,20 +144,22 @@ document.querySelectorAll('.mode-btn').forEach(btn => {
 });
 applyMode();
 
-// ===== Marquee: clone halves until track wide enough; pixel-exact loop =====
+// ===== Marquee: rAF-driven seamless loop. Two identical halves, wrap = halfPx =====
+const mqTrack = document.getElementById('marqueeTrack');
+let mqHalfPx = 0;
+let mqOffset = 0;
+let mqLastT = 0;
+const MQ_SPEED = 80; // px/sec
+
 function buildMarquee() {
-  const track = document.getElementById('marqueeTrack');
+  const track = mqTrack;
   const firstHalf = document.getElementById('marqueeHalf');
   if (!track || !firstHalf) return;
 
-  // Pause animation while we rebuild so width changes don't jolt the loop.
-  track.classList.remove('ready');
-
-  // Remove any clones from a previous build (keep the original first half).
+  // Wipe any clones from prior build.
   Array.from(track.children).forEach((c, i) => { if (i > 0) c.remove(); });
 
-  // Reset firstHalf to its original 12 items (6 spans + 6 stars).
-  // Mark originals on first build so we can restore on resize.
+  // Reset firstHalf to its original items.
   if (!firstHalf.dataset.original) {
     firstHalf.dataset.original = firstHalf.innerHTML;
   } else {
@@ -168,7 +170,7 @@ function buildMarquee() {
   let halfWidth = firstHalf.getBoundingClientRect().width;
   if (halfWidth <= 0) return;
 
-  // Each half must span ≥ viewport so wrap is invisible. Pad with item clones.
+  // Pad firstHalf with item clones until it spans ≥ 1.1 * viewport.
   const items = Array.from(firstHalf.children).map(n => n.cloneNode(true));
   let safety = 0;
   while (firstHalf.getBoundingClientRect().width < vw * 1.1 && safety < 40) {
@@ -177,41 +179,51 @@ function buildMarquee() {
   }
   halfWidth = firstHalf.getBoundingClientRect().width;
 
-  // Duplicate entire first half once → exactly 2 identical halves.
+  // Duplicate entire first half → exactly 2 identical halves.
   const clone = firstHalf.cloneNode(true);
   clone.removeAttribute('id');
   delete clone.dataset.original;
   clone.setAttribute('aria-hidden', 'true');
   track.appendChild(clone);
 
-  // Pixel-exact loop: animation shifts by halfWidth so wrap matches perfectly.
-  track.style.setProperty('--marquee-shift', halfWidth + 'px');
-  const dur = Math.max(20, Math.round(halfWidth / 80)); // ~80 px/sec
-  track.style.setProperty('--marquee-dur', dur + 's');
+  mqHalfPx = halfWidth;
+  // Keep current offset valid after rebuild.
+  if (mqOffset >= mqHalfPx) mqOffset = mqOffset % mqHalfPx;
+}
 
-  // Force animation restart with the new shift value.
-  void track.offsetWidth;
-  track.classList.add('ready');
+function mqTick(t) {
+  if (mqTrack && mqHalfPx > 0) {
+    if (!mqLastT) mqLastT = t;
+    const dt = (t - mqLastT) / 1000;
+    mqLastT = t;
+    // Cap dt to avoid huge jumps after tab unfocus.
+    const safeDt = Math.min(dt, 0.1);
+    mqOffset += MQ_SPEED * safeDt;
+    if (mqOffset >= mqHalfPx) mqOffset -= mqHalfPx;
+    mqTrack.style.transform = `translateX(${-mqOffset}px)`;
+  } else {
+    mqLastT = t;
+  }
+  requestAnimationFrame(mqTick);
 }
 
 buildMarquee();
+requestAnimationFrame(mqTick);
 
-// Re-run after fonts load (emoji/font widths can change measurements).
+// Re-measure after fonts load (emoji/font widths can shift).
 if (document.fonts && document.fonts.ready) {
   document.fonts.ready.then(buildMarquee);
 }
 
-let mqResizeRaf = 0;
+// Reset clock on tab return so dt doesn't blow up.
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) mqLastT = 0;
+});
+
 let mqResizeT = 0;
 window.addEventListener('resize', () => {
   clearTimeout(mqResizeT);
-  mqResizeT = setTimeout(() => {
-    if (mqResizeRaf) return;
-    mqResizeRaf = requestAnimationFrame(() => {
-      mqResizeRaf = 0;
-      buildMarquee();
-    });
-  }, 150);
+  mqResizeT = setTimeout(buildMarquee, 150);
 });
 
 // ===== Sticky mini-bar =====
