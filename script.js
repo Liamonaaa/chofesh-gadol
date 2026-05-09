@@ -226,6 +226,115 @@ window.addEventListener('resize', () => {
   mqResizeT = setTimeout(buildMarquee, 150);
 });
 
+// ===== Emoji picker =====
+const EMOJI_CATEGORIES = [
+  { tab: '😀', name: 'פרצופים', list: ['😀','😃','😄','😁','😆','😅','🤣','😂','🙂','🙃','😉','😊','😇','🥰','😍','🤩','😘','😗','☺️','😚','😙','🥲','😋','😛','😜','🤪','😝','🤑','🤗','🤭','🤫','🤔','🤐','🤨','😐','😑','😶','😏','😒','🙄','😬','🤥','😌','😔','😪','🤤','😴','😷','🤒','🤕','🤢','🤮','🥵','🥶','🥴','😵','🤯','🤠','🥳','🥸','😎','🤓','🧐','😕','😟','🙁','☹️','😮','😯','😲','😳','🥺','😦','😧','😨','😰','😥','😢','😭','😱','😖','😣','😞','😓','😩','😫','🥱','😤','😡','😠','🤬','😈','👿','💀','☠️','💩','🤡','👻','👽','🤖'] },
+  { tab: '🌞', name: 'קיץ', list: ['🌞','☀️','🌝','🌚','🌛','🌜','🌙','⭐','🌟','✨','⚡','🔥','💥','☁️','⛅','🌤️','🌥️','🌦️','🌈','☔','💧','💦','🌊','🏖️','🏝️','🏜️','🏕️','🌅','🌄','🌇','🌆','🌃','🌌','🎆','🎇','🌴','🌳','🌲','🌵','🌾','🌿','☘️','🍀','🍃','🍂','🍁','🌸','💐','🌷','🌹','🥀','🌺','🌻','🪷'] },
+  { tab: '🍦', name: 'אוכל', list: ['🍦','🍨','🍧','🍉','🍌','🍓','🍒','🍑','🥭','🍍','🥥','🥝','🍇','🍈','🍋','🍊','🍎','🍏','🍐','🥑','🍅','🍆','🥒','🌽','🥕','🌶️','🥔','🍠','🥐','🥯','🍞','🥖','🥨','🧀','🥚','🍳','🥞','🧇','🥓','🥩','🍗','🍖','🌭','🍔','🍟','🍕','🥪','🌮','🌯','🥗','🍝','🍜','🍲','🍛','🍱','🍣','🍤','🍙','🍚','🍘','🥟','🍢','🍡','🍧','🍨','🍰','🎂','🧁','🥧','🍫','🍬','🍭','🍮','🍯','🍿','🥤','🧋','🧃','🍹','🍸','🍷','🥂','🍾','🍺','🍻','☕','🍵','🥛'] },
+  { tab: '⚽', name: 'פעילויות', list: ['⚽','🏀','🏈','⚾','🥎','🎾','🏐','🏉','🥏','🎱','🪀','🏓','🏸','🏒','🏑','🥍','🏏','🪃','🥅','⛳','🪁','🏹','🎣','🤿','🥊','🥋','🎽','🛹','🛼','🛷','⛸️','🥌','🎿','⛷️','🏂','🪂','🏋️','🤸','🤼','🤽','🤾','🏌️','🏇','🧘','🏄','🏊','🤽','🚣','🧗','🚵','🚴','🎮','🕹️','🎰','🎲','🧩','🎯','🎳','🎤','🎧','🎼','🎵','🎶','🎹','🥁','🎷','🎺','🎸','🪕','🎻','🪘','🎬','🎨'] },
+  { tab: '✈️', name: 'נסיעות', list: ['✈️','🛫','🛬','🛩️','💺','🚀','🛸','🚁','⛵','🚤','🛥️','🛳️','⛴️','🚢','⚓','🚗','🚕','🚙','🚌','🚎','🏎️','🚓','🚑','🚒','🚐','🚚','🚛','🚜','🛵','🏍️','🚲','🛴','🛹','🚂','🚆','🚊','🚉','🚇','🚈','🗺️','🗿','🗽','🗼','🏰','🏯','🏟️','🎡','🎢','🎠','⛲','⛱️','🏖️','🏝️','🏜️','🌋','⛰️','🏔️','🗻','🏕️','⛺','🏠','🏡','🏘️','🏚️','🏗️','🏭','🏢','🏬','🏣','🏤','🏥','🏦','🏨','🏪','🏫','🏩','💒','⛪','🕌','🕍','🛕','🕋','⛩️'] },
+  { tab: '❤️', name: 'לבבות', list: ['❤️','🧡','💛','💚','💙','💜','🤎','🖤','🤍','💔','❣️','💕','💞','💓','💗','💖','💘','💝','💟','♥️','💌','💋','💯','💢','💥','💫','💦','💨','🕳️','💣','💬','💭','🗯️','♻️','🌟','⭐','🔥'] },
+  { tab: '🎒', name: 'אובייקטים', list: ['🎒','📚','📖','📕','📗','📘','📙','📓','📔','📒','📃','📜','📄','📰','🗞️','📑','🔖','🏷️','💰','💴','💵','💶','💷','💸','💳','💎','⚖️','🪜','🧰','🔧','🔨','⚒️','🛠️','⛏️','🪚','🔩','⚙️','🪤','🧱','⛓️','🧲','🔫','💣','🧨','🪓','🔪','🗡️','⚔️','🛡️','🚬','⚰️','⚱️','🏺','🔮','📿','🧿','💈','⚗️','🔭','🔬','🕳️','🩹','🩺','💊','💉','🩸','🧬','🦠','🧫','🧪','🌡️','🧹','🧺','🧻','🚽','🚰','🚿','🛁','🛀','🧼','🪥','🪒','🧽','🧴','🛎️','🔑','🗝️','🚪','🛋️','🛏️','🛌','🧸','🖼️','🪞','🪟','🛍️','🛒','🎁','🎈','🎏','🎀','🎊','🎉','🎎','🏮','🎐','🧧','✉️','📩','📨','📧','💌','📥','📤','📦','🏷️','📪','📫','📬','📭','📮','📯','📜','📃','📄','📑','🧾','📊','📈','📉','🗒️','🗓️','📅','📆','🗑️','📇','🗃️','🗳️','🗄️','📋','📁','📂','🗂️','🗞️','📰','📓','📔','📒','📕','📗','📘','📙','📚','📖','🔖','🧷','🔗','📎','🖇️','📐','📏','🧮','📌','📍','✂️','🖊️','🖋️','✒️','🖌️','🖍️','📝','✏️','🔍','🔎','🔏','🔐','🔒','🔓'] },
+];
+
+const emojiBtn = document.getElementById('byeIconBtn');
+const emojiHidden = document.getElementById('byeIcon');
+const emojiPicker = document.getElementById('emojiPicker');
+const emojiTabs = document.getElementById('emojiTabs');
+const emojiGrid = document.getElementById('emojiGrid');
+const emojiSearch = document.getElementById('emojiSearch');
+let emojiCatIdx = 0;
+
+function renderEmojiTabs() {
+  if (!emojiTabs) return;
+  emojiTabs.innerHTML = '';
+  EMOJI_CATEGORIES.forEach((cat, i) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'emoji-tab' + (i === emojiCatIdx ? ' active' : '');
+    b.textContent = cat.tab;
+    b.title = cat.name;
+    b.setAttribute('aria-label', cat.name);
+    b.addEventListener('click', () => {
+      emojiCatIdx = i;
+      if (emojiSearch) emojiSearch.value = '';
+      renderEmojiTabs();
+      renderEmojiGrid();
+    });
+    emojiTabs.appendChild(b);
+  });
+}
+function renderEmojiGrid(filter = '') {
+  if (!emojiGrid) return;
+  emojiGrid.innerHTML = '';
+  let list;
+  if (filter) {
+    const seen = new Set();
+    list = [];
+    EMOJI_CATEGORIES.forEach(c => c.list.forEach(e => { if (!seen.has(e)) { seen.add(e); list.push(e); } }));
+    // No reliable name match without a names map; just show all when searching.
+    // Optional: filter by codepoint match of typed emoji.
+    if (filter.trim()) {
+      const f = filter.trim();
+      list = list.filter(e => e.includes(f));
+      if (list.length === 0) {
+        const empty = document.createElement('div');
+        empty.className = 'emoji-empty';
+        empty.textContent = 'לא נמצא';
+        emojiGrid.appendChild(empty);
+        return;
+      }
+    }
+  } else {
+    list = EMOJI_CATEGORIES[emojiCatIdx].list;
+  }
+  list.forEach(e => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'emoji-cell';
+    b.textContent = e;
+    b.setAttribute('aria-label', e);
+    b.addEventListener('click', () => selectEmoji(e));
+    emojiGrid.appendChild(b);
+  });
+}
+function selectEmoji(e) {
+  if (emojiBtn) emojiBtn.textContent = e;
+  if (emojiHidden) emojiHidden.value = e;
+  closeEmojiPicker();
+}
+function openEmojiPicker() {
+  if (!emojiPicker) return;
+  emojiPicker.hidden = false;
+  if (emojiBtn) emojiBtn.setAttribute('aria-expanded', 'true');
+  renderEmojiTabs();
+  renderEmojiGrid();
+}
+function closeEmojiPicker() {
+  if (!emojiPicker) return;
+  emojiPicker.hidden = true;
+  if (emojiBtn) emojiBtn.setAttribute('aria-expanded', 'false');
+  if (emojiSearch) emojiSearch.value = '';
+}
+if (emojiBtn) {
+  emojiBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (emojiPicker.hidden) openEmojiPicker(); else closeEmojiPicker();
+  });
+}
+if (emojiSearch) {
+  emojiSearch.addEventListener('input', () => renderEmojiGrid(emojiSearch.value));
+  emojiSearch.addEventListener('click', e => e.stopPropagation());
+}
+document.addEventListener('click', (e) => {
+  if (!emojiPicker || emojiPicker.hidden) return;
+  if (emojiPicker.contains(e.target) || emojiBtn.contains(e.target)) return;
+  closeEmojiPicker();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && emojiPicker && !emojiPicker.hidden) closeEmojiPicker();
+});
+
 // ===== Bye section: user-added cards =====
 const BYE_KEY = 'chofesh-bye-extras';
 const byeGrid = document.getElementById('byeGrid');
@@ -274,6 +383,8 @@ if (byeForm) {
     const text = (byeTextInput.value || '').trim();
     if (!text) return;
     const icon = (byeIconInput.value || '').trim() || '✨';
+    // Reset trigger button visual to placeholder for next add.
+    if (emojiBtn) emojiBtn.textContent = '🙃';
     const list = loadByeExtras();
     list.push({ id: Date.now() + '-' + Math.random().toString(36).slice(2, 7), icon, text });
     saveByeExtras(list);
