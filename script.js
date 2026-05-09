@@ -226,6 +226,64 @@ window.addEventListener('resize', () => {
   mqResizeT = setTimeout(buildMarquee, 150);
 });
 
+// ===== Bye section: user-added cards =====
+const BYE_KEY = 'chofesh-bye-extras';
+const byeGrid = document.getElementById('byeGrid');
+const byeForm = document.getElementById('byeAddForm');
+const byeIconInput = document.getElementById('byeIcon');
+const byeTextInput = document.getElementById('byeText');
+
+function loadByeExtras() {
+  try { return JSON.parse(localStorage.getItem(BYE_KEY)) || []; }
+  catch { return []; }
+}
+function saveByeExtras(list) {
+  localStorage.setItem(BYE_KEY, JSON.stringify(list));
+}
+function renderByeExtras() {
+  if (!byeGrid) return;
+  // Drop any existing user cards.
+  byeGrid.querySelectorAll('.bye-card.user').forEach(n => n.remove());
+  const list = loadByeExtras();
+  list.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'bye-card user';
+    card.dataset.id = item.id;
+    card.innerHTML = `
+      <button class="bye-remove" type="button" aria-label="הסר">✕</button>
+      <span class="bye-x">✕</span>
+      <span class="bye-icon">${escapeHtml(item.icon || '✨')}</span>
+      <span class="bye-text">${escapeHtml(item.text)}</span>
+    `;
+    card.querySelector('.bye-remove').addEventListener('click', () => {
+      const next = loadByeExtras().filter(x => x.id !== item.id);
+      saveByeExtras(next);
+      renderByeExtras();
+    });
+    byeGrid.appendChild(card);
+  });
+}
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+}
+if (byeForm) {
+  byeForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const text = (byeTextInput.value || '').trim();
+    if (!text) return;
+    const icon = (byeIconInput.value || '').trim() || '✨';
+    const list = loadByeExtras();
+    list.push({ id: Date.now() + '-' + Math.random().toString(36).slice(2, 7), icon, text });
+    saveByeExtras(list);
+    byeIconInput.value = '';
+    byeTextInput.value = '';
+    renderByeExtras();
+  });
+}
+renderByeExtras();
+
 // ===== Sticky mini-bar =====
 const miniBar = document.getElementById('miniBar');
 window.addEventListener('scroll', () => {

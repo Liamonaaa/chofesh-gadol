@@ -134,7 +134,7 @@
   <div class="container">
     <p class="eyebrow">להתראות</p>
     <h2 class="section-title">כמה דברים שאף אחד לא יתגעגע אליהם.</h2>
-    <div class="bye-grid">
+    <div class="bye-grid" id="byeGrid">
       <div class="bye-card"><span class="bye-x">✕</span><span class="bye-icon">🎒</span><span class="bye-text">תיקים כבדים</span></div>
       <div class="bye-card"><span class="bye-x">✕</span><span class="bye-icon">⏰</span><span class="bye-text">שעון מעורר ב־6:30</span></div>
       <div class="bye-card"><span class="bye-x">✕</span><span class="bye-icon">📝</span><span class="bye-text">מבחנים</span></div>
@@ -142,6 +142,15 @@
       <div class="bye-card"><span class="bye-x">✕</span><span class="bye-icon">👕</span><span class="bye-text">תלבושת</span></div>
       <div class="bye-card"><span class="bye-x">✕</span><span class="bye-icon">📐</span><span class="bye-text">מתמטיקה ב־8 בבוקר</span></div>
     </div>
+
+    <form class="bye-add" id="byeAddForm" autocomplete="off">
+      <label class="bye-add-label" for="byeIcon">הוסף משלך</label>
+      <div class="bye-add-row">
+        <input type="text" id="byeIcon" class="bye-add-icon" maxlength="2" placeholder="🙃" aria-label="אימוג'י" />
+        <input type="text" id="byeText" class="bye-add-text" maxlength="40" placeholder="מה לא יחסר לך?" aria-label="טקסט" required />
+        <button type="submit" class="bye-add-btn">הוסף ✕</button>
+      </div>
+    </form>
     <div class="bye-final">
       <p class="bye-line">ובמקום זה...</p>
       <h3 class="bye-big">חופש. גדול.</h3>

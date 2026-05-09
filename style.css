@@ -782,6 +782,89 @@ a { color: inherit; text-decoration: none; }
   text-decoration-color: var(--watermelon);
   text-decoration-thickness: 2px;
 }
+.bye-card.user .bye-icon { filter: none; opacity: 1; }
+.bye-card .bye-remove {
+  position: absolute;
+  top: 10px; left: 12px;
+  width: 24px; height: 24px;
+  border: none;
+  background: rgba(30, 58, 95, 0.08);
+  color: var(--navy);
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 0.9rem;
+  line-height: 1;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, color 0.2s;
+}
+.bye-card.user .bye-remove { display: flex; }
+.bye-card .bye-remove:hover { background: var(--watermelon); color: #fff; }
+
+.bye-add {
+  margin-top: 28px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 2px dashed var(--watermelon);
+  border-radius: 22px;
+  padding: 22px 22px 24px;
+  max-width: 720px;
+  margin-left: auto;
+  margin-right: auto;
+  box-shadow: 0 8px 22px rgba(255, 107, 157, 0.15);
+}
+.bye-add-label {
+  display: block;
+  font-family: "Fredoka", "Heebo", sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--watermelon-deep);
+  margin-bottom: 12px;
+  text-align: center;
+}
+.bye-add-row {
+  display: flex;
+  gap: 10px;
+  flex-direction: row-reverse;
+}
+.bye-add-icon, .bye-add-text {
+  font-family: "Heebo", sans-serif;
+  font-size: 1rem;
+  padding: 12px 14px;
+  border: 2px solid #FFE9B7;
+  border-radius: 14px;
+  background: #fff;
+  color: var(--navy);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.bye-add-icon { width: 64px; text-align: center; font-size: 1.4rem; }
+.bye-add-text { flex: 1; min-width: 0; }
+.bye-add-icon:focus, .bye-add-text:focus {
+  border-color: var(--watermelon);
+  box-shadow: 0 0 0 3px rgba(255, 107, 157, 0.18);
+}
+.bye-add-btn {
+  font-family: "Fredoka", "Heebo", sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 12px 22px;
+  border: none;
+  border-radius: 14px;
+  background: var(--watermelon);
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(255, 107, 157, 0.4);
+  transition: transform 0.2s, background 0.2s;
+  white-space: nowrap;
+}
+.bye-add-btn:hover { background: var(--watermelon-deep); transform: translateY(-2px); }
+.bye-add-btn:active { transform: translateY(0); }
+@media (max-width: 520px) {
+  .bye-add-row { flex-wrap: wrap; }
+  .bye-add-text { flex: 1 1 100%; }
+}
+
 .bye-final {
   margin-top: 60px;
   text-align: center;
