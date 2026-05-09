@@ -587,6 +587,66 @@ if (byeForm) {
   });
 }
 
+// ===== Sound hint overlay (first visit) =====
+const SOUND_HINT_KEY = 'chofesh-sound-hint-seen';
+const soundHint = document.getElementById('soundHint');
+const soundHintOk = document.getElementById('shOk');
+const soundHintArrowPath = document.querySelector('.sh-arrow-path');
+
+function dismissSoundHint() {
+  if (!soundHint || soundHint.hidden) return;
+  soundHint.hidden = true;
+  document.body.classList.remove('sh-active');
+  try { localStorage.setItem(SOUND_HINT_KEY, '1'); } catch {}
+}
+
+function aimArrowAtAudio() {
+  if (!soundHintArrowPath) return;
+  const audioPanel = document.getElementById('audioPanel');
+  const muteBtn = document.getElementById('apMute');
+  const target = muteBtn || audioPanel;
+  if (!target) return;
+  const r = target.getBoundingClientRect();
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  if (vw === 0 || vh === 0) return;
+  // viewBox is 600x600, preserveAspectRatio="none" → x scales by 600/vw, y by 600/vh.
+  const tx = ((r.left + r.width / 2) / vw) * 600;
+  const ty = ((r.top + r.height / 2) / vh) * 600;
+  // Start near center-card bottom, curve down-left toward target.
+  const sx = 320, sy = 240;
+  const cx = (sx + tx) / 2 - 60;
+  const cy = (sy + ty) / 2 + 40;
+  // Stop arrowhead just shy of target so it points AT the button.
+  const dx = tx - sx, dy = ty - sy;
+  const len = Math.hypot(dx, dy) || 1;
+  const back = 30;
+  const ex = tx - (dx / len) * back;
+  const ey = ty - (dy / len) * back;
+  soundHintArrowPath.setAttribute('d', `M ${sx} ${sy} Q ${cx} ${cy} ${ex} ${ey}`);
+}
+
+if (soundHint) {
+  let seen = false;
+  try { seen = localStorage.getItem(SOUND_HINT_KEY) === '1'; } catch {}
+  if (!seen) {
+    soundHint.hidden = false;
+    document.body.classList.add('sh-active');
+    aimArrowAtAudio();
+    window.addEventListener('resize', aimArrowAtAudio);
+    // Dismiss on OK click.
+    if (soundHintOk) soundHintOk.addEventListener('click', dismissSoundHint);
+    // Dismiss on backdrop click.
+    soundHint.querySelector('.sh-backdrop')?.addEventListener('click', dismissSoundHint);
+    // Dismiss when user clicks the audio mute button.
+    document.getElementById('apMute')?.addEventListener('click', dismissSoundHint, { once: false });
+    // Dismiss on Escape.
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !soundHint.hidden) dismissSoundHint();
+    });
+  }
+}
+
 // ===== Sticky mini-bar =====
 const miniBar = document.getElementById('miniBar');
 window.addEventListener('scroll', () => {

@@ -1031,6 +1031,125 @@ a { color: inherit; text-decoration: none; }
   margin: 0 auto;
 }
 
+/* ========== Sound hint overlay ========== */
+.sound-hint {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  animation: shFadeIn 0.4s ease;
+}
+.sound-hint[hidden] { display: none; }
+.sh-backdrop {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 12% 92%, rgba(255, 107, 157, 0.25) 0%, rgba(0, 0, 0, 0.55) 60%);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.sh-arrow {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  filter: drop-shadow(0 8px 18px rgba(255, 107, 157, 0.45));
+}
+.sh-arrow-path {
+  stroke-dasharray: 700;
+  stroke-dashoffset: 700;
+  animation: shDraw 1.2s ease-out 0.3s forwards, shPulse 1.6s ease-in-out 1.5s infinite;
+}
+@keyframes shDraw {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes shPulse {
+  0%, 100% { opacity: 1; transform: translateY(0); }
+  50% { opacity: 0.7; transform: translateY(8px); }
+}
+@keyframes shFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.sh-card {
+  position: relative;
+  z-index: 2;
+  background: #fff;
+  border: 4px solid var(--watermelon);
+  border-radius: 28px;
+  padding: 32px 36px 28px;
+  text-align: center;
+  max-width: 420px;
+  width: calc(100% - 48px);
+  box-shadow: 0 24px 60px rgba(255, 107, 157, 0.45), 0 8px 20px rgba(0, 0, 0, 0.15);
+  transform: translateY(-8%);
+  animation: shPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  direction: rtl;
+}
+@keyframes shPop {
+  from { opacity: 0; transform: translateY(-8%) scale(0.8); }
+  to { opacity: 1; transform: translateY(-8%) scale(1); }
+}
+.sh-emoji {
+  font-size: 4rem;
+  line-height: 1;
+  margin-bottom: 12px;
+  animation: shBob 1.6s ease-in-out infinite;
+}
+@keyframes shBob {
+  0%, 100% { transform: translateY(0) rotate(-3deg); }
+  50% { transform: translateY(-8px) rotate(3deg); }
+}
+.sh-title {
+  font-family: "Fredoka", "Heebo", sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+  color: var(--watermelon-deep);
+  margin-bottom: 12px;
+  line-height: 1.1;
+}
+.sh-text {
+  font-family: "Heebo", sans-serif;
+  font-size: 1.05rem;
+  color: var(--navy);
+  margin-bottom: 22px;
+  line-height: 1.5;
+}
+.sh-ok {
+  font-family: "Fredoka", "Heebo", sans-serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  padding: 12px 28px;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--watermelon), var(--sun));
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 8px 22px rgba(255, 107, 157, 0.5);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.sh-ok:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(255, 107, 157, 0.6); }
+.sh-ok:active { transform: translateY(0); }
+
+/* Highlight pulse on the audio panel while hint is visible. */
+.sound-hint ~ .audio-panel,
+body.sh-active .audio-panel {
+  z-index: 95;
+  animation: shAudioPulse 1.4s ease-in-out infinite;
+}
+@keyframes shAudioPulse {
+  0%, 100% { box-shadow: 0 12px 30px rgba(255, 107, 157, 0.5), 0 0 0 0 rgba(255, 107, 157, 0.6); transform: scale(1); }
+  50% { box-shadow: 0 12px 30px rgba(255, 107, 157, 0.7), 0 0 0 18px rgba(255, 107, 157, 0); transform: scale(1.06); }
+}
+
+@media (max-width: 720px) {
+  .sh-card { padding: 24px 22px 22px; }
+  .sh-emoji { font-size: 3rem; }
+}
+
 /* ========== Hidden YT iframe ========== */
 .audio-hidden {
   position: fixed;
