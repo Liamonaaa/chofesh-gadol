@@ -471,7 +471,24 @@ document.addEventListener('keydown', (e) => {
 // ===== Bye section: shared community cards via Worker API =====
 const BYE_API = 'https://chofesh-gadol-api.liamonaaa.workers.dev/items';
 const BYE_CACHE_KEY = 'chofesh-bye-cache';
-const BYE_MINE_KEY = 'chofesh-bye-mine'; // ids the current user added (so they can delete their own)
+const ADMIN_KEY = 'chofesh-admin-token';
+
+// Pick up admin token from URL ?admin=... and persist; then strip from URL.
+(function captureAdminToken() {
+  try {
+    const u = new URL(location.href);
+    const t = u.searchParams.get('admin');
+    if (t) {
+      localStorage.setItem(ADMIN_KEY, t);
+      u.searchParams.delete('admin');
+      history.replaceState(null, '', u.pathname + (u.search ? u.search : '') + u.hash);
+    }
+  } catch {}
+})();
+function getAdminToken() {
+  try { return localStorage.getItem(ADMIN_KEY) || ''; } catch { return ''; }
+}
+function isAdmin() { return !!getAdminToken(); }
 const byeGrid = document.getElementById('byeGrid');
 const byeForm = document.getElementById('byeAddForm');
 const byeIconInput = document.getElementById('byeIcon');
@@ -491,14 +508,6 @@ function loadCache() {
 function saveCache(list) {
   try { localStorage.setItem(BYE_CACHE_KEY, JSON.stringify(list)); } catch {}
 }
-function loadMine() {
-  try { return new Set(JSON.parse(localStorage.getItem(BYE_MINE_KEY)) || []); }
-  catch { return new Set(); }
-}
-function saveMine(set) {
-  try { localStorage.setItem(BYE_MINE_KEY, JSON.stringify([...set])); } catch {}
-}
-
 async function fetchItems() {
   const res = await fetch(BYE_API, { method: 'GET' });
   if (!res.ok) throw new Error('GET failed: ' + res.status);
@@ -515,7 +524,11 @@ async function postItem(icon, text) {
   return (await res.json()).item;
 }
 async function deleteItem(id) {
-  const res = await fetch(BYE_API + '/' + encodeURIComponent(id), { method: 'DELETE' });
+  const token = getAdminToken();
+  const res = await fetch(BYE_API + '/' + encodeURIComponent(id), {
+    method: 'DELETE',
+    headers: token ? { 'Authorization': 'Bearer ' + token } : {},
+  });
   if (!res.ok) throw new Error('DELETE failed: ' + res.status);
   return true;
 }
@@ -523,14 +536,13 @@ async function deleteItem(id) {
 function renderByeExtras(list) {
   if (!byeGrid) return;
   byeGrid.querySelectorAll('.bye-card.user').forEach(n => n.remove());
-  const mine = loadMine();
+  const admin = isAdmin();
   list.forEach(item => {
     const card = document.createElement('div');
     card.className = 'bye-card user';
     card.dataset.id = item.id;
-    const isMine = mine.has(item.id);
     card.innerHTML = `
-      ${isMine ? '<button class="bye-remove" type="button" aria-label="הסר">✕</button>' : ''}
+      ${admin ? '<button class="bye-remove" type="button" aria-label="הסר">✕</button>' : ''}
       <span class="bye-x">✕</span>
       <span class="bye-icon">${escapeHtml(item.icon || '✨')}</span>
       <span class="bye-text">${escapeHtml(item.text)}</span>
@@ -541,7 +553,6 @@ function renderByeExtras(list) {
         rm.disabled = true;
         try {
           await deleteItem(item.id);
-          const next = mine; next.delete(item.id); saveMine(next);
           await refreshByeFromServer();
         } catch (err) {
           rm.disabled = false;
@@ -581,8 +592,7 @@ if (byeForm) {
     const icon = (byeIconInput.value || '').trim() || '✨';
     if (byeAddBtn) byeAddBtn.disabled = true;
     try {
-      const item = await postItem(icon, text);
-      const mine = loadMine(); mine.add(item.id); saveMine(mine);
+      await postItem(icon, text);
       byeIconInput.value = '';
       byeTextInput.value = '';
       if (typeof emojiBtn !== 'undefined' && emojiBtn) emojiBtn.textContent = '🙃';
