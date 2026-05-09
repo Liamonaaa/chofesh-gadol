@@ -151,10 +151,14 @@
           <input type="hidden" id="byeIcon" value="" />
           <div class="emoji-picker" id="emojiPicker" role="dialog" aria-label="בחירת אימוג'י" hidden>
             <div class="emoji-search-row">
-              <input type="text" id="emojiSearch" class="emoji-search" placeholder="חיפוש..." aria-label="חיפוש אימוג'י" />
+              <input type="text" id="emojiSearch" class="emoji-search" placeholder="חיפוש (עברית/אנגלית)..." aria-label="חיפוש אימוג'י" />
             </div>
             <div class="emoji-tabs" id="emojiTabs" role="tablist"></div>
             <div class="emoji-grid" id="emojiGrid" role="listbox"></div>
+            <div class="emoji-paste-row">
+              <input type="text" id="emojiPaste" class="emoji-paste" maxlength="8" placeholder="או הדבק כאן אימוג'י משלך" aria-label="הדבק אימוג'י" />
+              <button type="button" id="emojiPasteBtn" class="emoji-paste-btn">בחר</button>
+            </div>
           </div>
         </div>
         <input type="text" id="byeText" class="bye-add-text" maxlength="40" placeholder="מה לא יחסר לך?" aria-label="טקסט" required />

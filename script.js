@@ -237,16 +237,72 @@ const EMOJI_CATEGORIES = [
   { tab: '🎒', name: 'אובייקטים', list: ['🎒','📚','📖','📕','📗','📘','📙','📓','📔','📒','📃','📜','📄','📰','🗞️','📑','🔖','🏷️','💰','💴','💵','💶','💷','💸','💳','💎','⚖️','🪜','🧰','🔧','🔨','⚒️','🛠️','⛏️','🪚','🔩','⚙️','🪤','🧱','⛓️','🧲','🔫','💣','🧨','🪓','🔪','🗡️','⚔️','🛡️','🚬','⚰️','⚱️','🏺','🔮','📿','🧿','💈','⚗️','🔭','🔬','🕳️','🩹','🩺','💊','💉','🩸','🧬','🦠','🧫','🧪','🌡️','🧹','🧺','🧻','🚽','🚰','🚿','🛁','🛀','🧼','🪥','🪒','🧽','🧴','🛎️','🔑','🗝️','🚪','🛋️','🛏️','🛌','🧸','🖼️','🪞','🪟','🛍️','🛒','🎁','🎈','🎏','🎀','🎊','🎉','🎎','🏮','🎐','🧧','✉️','📩','📨','📧','💌','📥','📤','📦','🏷️','📪','📫','📬','📭','📮','📯','📜','📃','📄','📑','🧾','📊','📈','📉','🗒️','🗓️','📅','📆','🗑️','📇','🗃️','🗳️','🗄️','📋','📁','📂','🗂️','🗞️','📰','📓','📔','📒','📕','📗','📘','📙','📚','📖','🔖','🧷','🔗','📎','🖇️','📐','📏','🧮','📌','📍','✂️','🖊️','🖋️','✒️','🖌️','🖍️','📝','✏️','🔍','🔎','🔏','🔐','🔒','🔓'] },
 ];
 
+// Keyword index for search (Hebrew + English). Subset; emojis without entry only browsable.
+const EMOJI_KEYWORDS = {
+  '😀':'smile happy grin שמח חיוך מחייך פרצוף שמחה','😃':'smile happy שמח חיוך','😄':'smile happy laugh שמח חיוך','😁':'grin smile שמח חיוך','😆':'laugh צוחק','😅':'sweat laugh צוחק זיעה מבויש',
+  '🤣':'rofl laugh בוכה צחוק לול','😂':'joy laugh cry בוכה צוחק לול דמעות','🙂':'smile slight חיוך','🙃':'upside הפוך משוגע','😉':'wink קריצה','😊':'blush smile מסמיק חיוך מבויש',
+  '😇':'angel halo מלאך','🥰':'love hearts אוהב מאוהב לבבות','😍':'love heart eyes מאוהב לבבות','🤩':'star eyes מתפעל מתלהב','😘':'kiss נשיקה','😗':'kiss נשיקה','😚':'kiss נשיקה','😙':'kiss נשיקה',
+  '🥲':'tear smile דמעות חיוך','😋':'yum טעים','😛':'tongue לשון','😜':'tongue wink לשון קריצה','🤪':'crazy מטורף','😝':'tongue לשון','🤑':'money כסף','🤗':'hug חיבוק',
+  '🤭':'oops shy שקט ששש','🤫':'shh שקט סוד','🤔':'think חושב מחשבה','🤐':'zip שקט סגור','🤨':'eyebrow חשוד','😐':'neutral רגיל','😑':'expressionless ללא הבעה',
+  '😶':'no mouth שותק','😏':'smirk שובב','😒':'unamused משועמם מתעצבן','🙄':'eye roll גלגול עיניים','😬':'grimace מבויש','🤥':'lie liar שקרן','😌':'relieved נינוח','😔':'pensive עצוב מהורהר',
+  '😪':'sleepy עייף','🤤':'drool ריר','😴':'sleep ישן','😷':'mask מסכה חולה','🤒':'sick חולה חום','🤕':'hurt פצוע','🤢':'nausea בחילה','🤮':'vomit מקיא',
+  '🥵':'hot חם','🥶':'cold קר','🥴':'woozy שיכור','😵':'dizzy סחרחר','🤯':'mind blown מטורף','🤠':'cowboy בוקר','🥳':'party מסיבה חוגג','🥸':'disguise תחפושת',
+  '😎':'cool sunglasses קול משקפיים','🤓':'nerd חנון','🧐':'monocle חוקר','😕':'confused מבולבל','😟':'worried דואג','🙁':'frown עצוב','☹️':'frown עצוב','😮':'surprised מופתע',
+  '😯':'surprised מופתע','😲':'shocked הלם','😳':'flushed נבוך','🥺':'pleading מתחנן','😦':'frown עצוב','😧':'anguish יסורים','😨':'fear פחד','😰':'anxious חרדה',
+  '😥':'sad עצוב','😢':'cry בוכה דמעה','😭':'sob בוכה בכי','😱':'scream צרחה פחד','😖':'confounded מבולבל','😣':'persevere מתאמץ','😞':'disappointed מאוכזב','😓':'sweat זיעה לחץ',
+  '😩':'weary מותש','😫':'tired עייף','🥱':'yawn מפהק','😤':'huff כועס','😡':'angry rage כועס עצבני','😠':'angry כועס','🤬':'curse קללה','😈':'devil שטן',
+  '👿':'imp שדון','💀':'skull גולגולת מוות','☠️':'skull crossbones גולגולת','💩':'poop קקי','🤡':'clown ליצן','👻':'ghost רוח','👽':'alien חייזר','🤖':'robot רובוט',
+
+  '🌞':'sun summer שמש קיץ','☀️':'sun שמש','🌝':'moon ירח','🌚':'moon ירח','🌛':'moon ירח','🌜':'moon ירח','🌙':'moon ירח crescent','⭐':'star כוכב','🌟':'star כוכב נצנוץ','✨':'sparkle נצנוץ קסם','⚡':'lightning ברק','🔥':'fire אש',
+  '💥':'boom פיצוץ','☁️':'cloud ענן','⛅':'cloud sun ענן','🌤️':'sun cloud שמש','🌥️':'sun cloud שמש','🌦️':'rain sun גשם','🌈':'rainbow קשת','☔':'rain umbrella גשם מטריה','💧':'drop טיפה','💦':'sweat splash זיעה מים',
+  '🌊':'wave sea ים גל','🏖️':'beach חוף','🏝️':'island אי','🏜️':'desert מדבר','🏕️':'camp קמפינג','🌅':'sunrise זריחה','🌄':'sunrise זריחה','🌇':'sunset שקיעה','🌆':'sunset עיר','🌃':'night לילה',
+  '🌌':'milky way לילה כוכבים','🎆':'fireworks זיקוקים','🎇':'sparkler נצנוץ','🌴':'palm tree דקל','🌳':'tree עץ','🌲':'pine tree עץ','🌵':'cactus קקטוס','🌾':'wheat שיבולת','🌿':'herb עשב','☘️':'shamrock תלתן',
+  '🍀':'clover תלתן מזל','🍃':'leaf עלה','🍂':'leaf עלה','🍁':'maple leaf עלה','🌸':'blossom פרח','💐':'bouquet פרחים זר','🌷':'tulip צבעוני','🌹':'rose ורד','🥀':'wilted ורד','🌺':'hibiscus פרח','🌻':'sunflower חמנייה',
+
+  '🍦':'icecream גלידה','🍨':'icecream גלידה','🍧':'shaved ice ברד','🍉':'watermelon אבטיח','🍌':'banana בננה','🍓':'strawberry תות','🍒':'cherry דובדבן','🍑':'peach אפרסק','🥭':'mango מנגו','🍍':'pineapple אננס',
+  '🥥':'coconut קוקוס','🥝':'kiwi קיווי','🍇':'grapes ענבים','🍈':'melon מלון','🍋':'lemon לימון','🍊':'orange תפוז','🍎':'apple תפוח','🍏':'apple תפוח','🍐':'pear אגס','🥑':'avocado אבוקדו',
+  '🍅':'tomato עגבנייה','🍆':'eggplant חציל','🥒':'cucumber מלפפון','🌽':'corn תירס','🥕':'carrot גזר','🌶️':'pepper פלפל חריף','🥔':'potato תפוח אדמה','🥐':'croissant קרואסון','🥯':'bagel בייגל','🍞':'bread לחם',
+  '🥖':'baguette לחם','🥨':'pretzel בייגלה','🧀':'cheese גבינה','🥚':'egg ביצה','🍳':'fried egg ביצה','🥞':'pancakes פנקייק','🧇':'waffle ופל','🥓':'bacon בייקון','🥩':'steak סטייק','🍗':'chicken עוף',
+  '🍖':'meat בשר','🌭':'hotdog נקניקייה','🍔':'burger המבורגר','🍟':'fries צ\'יפס','🍕':'pizza פיצה','🥪':'sandwich סנדוויץ\'','🌮':'taco טאקו','🌯':'burrito בוריטו','🥗':'salad סלט','🍝':'pasta פסטה',
+  '🍜':'noodles נודלס אטריות','🍲':'stew מרק','🍛':'curry קארי','🍱':'bento ארוחה','🍣':'sushi סושי','🍤':'shrimp שרימפס','🍙':'rice ball אורז','🍚':'rice אורז','🍰':'cake עוגה','🎂':'birthday cake יומולדת',
+  '🧁':'cupcake עוגה','🥧':'pie פאי','🍫':'chocolate שוקולד','🍬':'candy סוכרייה','🍭':'lollipop סוכרייה','🍮':'pudding פודינג','🍯':'honey דבש','🍿':'popcorn פופקורן','🥤':'cup soda שתייה','🧋':'bubble tea באבל טי',
+  '🧃':'juice מיץ','🍹':'cocktail קוקטייל','🍸':'martini קוקטייל','🍷':'wine יין','🥂':'champagne שמפניה','🍺':'beer בירה','🍻':'beers בירה','☕':'coffee קפה','🍵':'tea תה','🥛':'milk חלב',
+
+  '⚽':'soccer ball כדורגל','🏀':'basketball כדורסל','🏈':'football פוטבול','⚾':'baseball בייסבול','🎾':'tennis טניס','🏐':'volleyball כדורעף','🥏':'frisbee פריזבי','🎱':'pool ביליארד','🏓':'pingpong פינגפונג','🏸':'badminton בדמינטון',
+  '🥅':'goal שער','⛳':'golf גולף','🎣':'fishing דיג','🥊':'boxing אגרוף','🎽':'jersey חולצה ספורט','🛹':'skateboard סקייטבורד','⛸️':'skate החלקה','🎿':'ski סקי','🏂':'snowboard סנובורד','🏋️':'lift הרמה כושר',
+  '🤸':'cartwheel גלגלון','🏊':'swim שחייה','🚴':'bike אופניים','🎮':'gaming משחקים','🕹️':'joystick ג\'ויסטיק','🎯':'target מטרה','🎳':'bowling באולינג','🎤':'mic מיקרופון','🎧':'headphones אוזניות',
+  '🎵':'music note מוזיקה','🎶':'music מוזיקה','🎹':'piano פסנתר','🥁':'drum תופים','🎷':'sax סקסופון','🎺':'trumpet חצוצרה','🎸':'guitar גיטרה','🎻':'violin כינור','🎬':'clapper סרט קולנוע','🎨':'art ציור אומנות',
+
+  '✈️':'plane מטוס','🚀':'rocket טיל חלל','🛸':'ufo עב\"מ','🚁':'helicopter מסוק','⛵':'sailboat סירה','🚤':'boat סירה','🛳️':'cruise ship ספינה','🚢':'ship ספינה','⚓':'anchor עוגן','🚗':'car רכב מכונית',
+  '🚕':'taxi מונית','🚙':'suv ג\'יפ','🚌':'bus אוטובוס','🏎️':'race car מירוץ','🚓':'police משטרה','🚑':'ambulance אמבולנס','🚒':'fire truck כבאית','🛵':'scooter קטנוע','🏍️':'motorcycle אופנוע','🚲':'bike אופניים',
+  '🛴':'scooter קורקינט','🚂':'train רכבת','🚆':'train רכבת','🚇':'subway רכבת תחתית','🗺️':'map מפה','🗽':'liberty פסל החירות','🏰':'castle טירה','🏟️':'stadium אצטדיון','🎡':'ferris wheel גלגל ענק','🎢':'roller coaster רכבת הרים',
+  '🎠':'carousel קרוסלה','⛲':'fountain מזרקה','🌋':'volcano הר געש','⛰️':'mountain הר','🏔️':'mountain הר','🗻':'mountain fuji הר','⛺':'tent אוהל קמפינג','🏠':'house בית','🏡':'house garden בית','🏥':'hospital בית חולים',
+  '🏫':'school בית ספר ספר','💒':'wedding חתונה','⛪':'church כנסייה','🕌':'mosque מסגד','🕍':'synagogue בית כנסת',
+
+  '❤️':'heart red לב אדום אהבה','🧡':'heart orange לב כתום','💛':'heart yellow לב צהוב','💚':'heart green לב ירוק','💙':'heart blue לב כחול','💜':'heart purple לב סגול','🤎':'heart brown לב חום','🖤':'heart black לב שחור','🤍':'heart white לב לבן','💔':'broken heart לב שבור',
+  '❣️':'heart לב','💕':'hearts לבבות','💞':'hearts לבבות','💓':'beating heart לב','💗':'growing heart לב','💖':'sparkling heart לב','💘':'cupid לב חץ','💝':'gift heart מתנה','💟':'heart לב','💌':'love letter מכתב אהבה','💋':'kiss נשיקה',
+  '💯':'hundred מאה מושלם','💢':'anger כעס','💫':'dizzy סחרחורת',
+
+  '🎒':'backpack תיק תרמיל','📚':'books ספרים','📖':'book ספר','📕':'book ספר','📗':'book ספר','📘':'book ספר','📙':'book ספר','📓':'notebook מחברת','📰':'news עיתון','📜':'scroll מגילה',
+  '💰':'money כסף','💵':'dollar דולר','💸':'flying money כסף','💳':'card כרטיס אשראי','💎':'diamond יהלום','🔑':'key מפתח','🎁':'gift מתנה','🎈':'balloon בלון','🎉':'party מסיבה חוגג','🎊':'confetti חגיגה',
+  '🛍️':'shopping קניות','🛒':'cart עגלה קניות','📝':'memo פתק רשימה','✏️':'pencil עיפרון','🔍':'search חיפוש','🔒':'lock נעילה','🔓':'unlock פתוח','📱':'phone טלפון','💻':'laptop מחשב','⏰':'alarm שעון מעורר',
+
+  '🦠':'germ חיידק','🧬':'dna גנים','💉':'syringe זריקה','💊':'pill כדור','🩺':'stethoscope רופא','🌡️':'thermometer מדחום',
+};
+
 const emojiBtn = document.getElementById('byeIconBtn');
 const emojiHidden = document.getElementById('byeIcon');
 const emojiPicker = document.getElementById('emojiPicker');
 const emojiTabs = document.getElementById('emojiTabs');
 const emojiGrid = document.getElementById('emojiGrid');
 const emojiSearch = document.getElementById('emojiSearch');
+const emojiPasteInput = document.getElementById('emojiPaste');
+const emojiPasteBtn = document.getElementById('emojiPasteBtn');
 let emojiCatIdx = 0;
+let emojiTabsBuilt = false;
 
-function renderEmojiTabs() {
-  if (!emojiTabs) return;
+function buildEmojiTabsOnce() {
+  if (!emojiTabs || emojiTabsBuilt) return;
   emojiTabs.innerHTML = '';
   EMOJI_CATEGORIES.forEach((cat, i) => {
     const b = document.createElement('button');
@@ -254,36 +310,58 @@ function renderEmojiTabs() {
     b.className = 'emoji-tab' + (i === emojiCatIdx ? ' active' : '');
     b.textContent = cat.tab;
     b.title = cat.name;
+    b.dataset.idx = String(i);
     b.setAttribute('aria-label', cat.name);
-    b.addEventListener('click', () => {
-      emojiCatIdx = i;
-      if (emojiSearch) emojiSearch.value = '';
-      renderEmojiTabs();
-      renderEmojiGrid();
-    });
     emojiTabs.appendChild(b);
   });
+  emojiTabsBuilt = true;
+  // Single delegated listener — does NOT rebuild DOM, only flips active class.
+  emojiTabs.addEventListener('click', (ev) => {
+    ev.stopPropagation();
+    const t = ev.target.closest('.emoji-tab');
+    if (!t) return;
+    const idx = parseInt(t.dataset.idx, 10);
+    if (Number.isNaN(idx)) return;
+    emojiCatIdx = idx;
+    if (emojiSearch) emojiSearch.value = '';
+    Array.from(emojiTabs.children).forEach((c, i) => c.classList.toggle('active', i === idx));
+    renderEmojiGrid();
+  });
 }
+
+function searchEmojis(query) {
+  const q = query.trim().toLowerCase();
+  if (!q) return [];
+  // Allow finding by exact emoji paste.
+  if (Object.prototype.hasOwnProperty.call(EMOJI_KEYWORDS, query.trim()) || /\p{Extended_Pictographic}/u.test(q)) {
+    // If user pasted an emoji, just return it (and any keyword match).
+    const direct = [];
+    if (/\p{Extended_Pictographic}/u.test(query.trim())) direct.push(query.trim());
+    return direct;
+  }
+  const terms = q.split(/\s+/).filter(Boolean);
+  const results = [];
+  for (const [emoji, kw] of Object.entries(EMOJI_KEYWORDS)) {
+    const tokens = (emoji + ' ' + kw).toLowerCase().split(/\s+/);
+    // Each query term must match the start of at least one keyword token (word-prefix).
+    if (terms.every(t => tokens.some(tok => tok.startsWith(t)))) results.push(emoji);
+  }
+  return results;
+}
+
 function renderEmojiGrid(filter = '') {
   if (!emojiGrid) return;
   emojiGrid.innerHTML = '';
   let list;
-  if (filter) {
-    const seen = new Set();
-    list = [];
-    EMOJI_CATEGORIES.forEach(c => c.list.forEach(e => { if (!seen.has(e)) { seen.add(e); list.push(e); } }));
-    // No reliable name match without a names map; just show all when searching.
-    // Optional: filter by codepoint match of typed emoji.
-    if (filter.trim()) {
-      const f = filter.trim();
-      list = list.filter(e => e.includes(f));
-      if (list.length === 0) {
-        const empty = document.createElement('div');
-        empty.className = 'emoji-empty';
-        empty.textContent = 'לא נמצא';
-        emojiGrid.appendChild(empty);
-        return;
-      }
+  const q = (filter || '').trim();
+  if (q) {
+    list = searchEmojis(q);
+    if (list.length === 0) {
+      const empty = document.createElement('div');
+      empty.className = 'emoji-empty';
+      empty.textContent = 'לא נמצא — נסה לכתוב באנגלית או להדביק אימוג\'י למטה';
+      emojiGrid.appendChild(empty);
+      return;
     }
   } else {
     list = EMOJI_CATEGORIES[emojiCatIdx].list;
@@ -294,10 +372,36 @@ function renderEmojiGrid(filter = '') {
     b.className = 'emoji-cell';
     b.textContent = e;
     b.setAttribute('aria-label', e);
-    b.addEventListener('click', () => selectEmoji(e));
     emojiGrid.appendChild(b);
   });
 }
+if (emojiGrid) {
+  emojiGrid.addEventListener('click', (ev) => {
+    ev.stopPropagation();
+    const cell = ev.target.closest('.emoji-cell');
+    if (!cell) return;
+    selectEmoji(cell.textContent);
+  });
+}
+
+function extractFirstEmoji(s) {
+  if (!s) return '';
+  const trimmed = String(s).trim();
+  if (!trimmed) return '';
+  // Use Intl.Segmenter for grapheme cluster, fallback to first 4 chars.
+  try {
+    if (typeof Intl !== 'undefined' && Intl.Segmenter) {
+      const seg = new Intl.Segmenter('en', { granularity: 'grapheme' });
+      for (const { segment } of seg.segment(trimmed)) {
+        if (/\p{Extended_Pictographic}/u.test(segment)) return segment;
+      }
+      return '';
+    }
+  } catch {}
+  // Fallback: take first cluster up to 8 chars
+  return trimmed.slice(0, 8);
+}
+
 function selectEmoji(e) {
   if (emojiBtn) emojiBtn.textContent = e;
   if (emojiHidden) emojiHidden.value = e;
@@ -307,7 +411,7 @@ function openEmojiPicker() {
   if (!emojiPicker) return;
   emojiPicker.hidden = false;
   if (emojiBtn) emojiBtn.setAttribute('aria-expanded', 'true');
-  renderEmojiTabs();
+  buildEmojiTabsOnce();
   renderEmojiGrid();
 }
 function closeEmojiPicker() {
@@ -315,6 +419,7 @@ function closeEmojiPicker() {
   emojiPicker.hidden = true;
   if (emojiBtn) emojiBtn.setAttribute('aria-expanded', 'false');
   if (emojiSearch) emojiSearch.value = '';
+  if (emojiPasteInput) emojiPasteInput.value = '';
 }
 if (emojiBtn) {
   emojiBtn.addEventListener('click', (e) => {
@@ -325,6 +430,25 @@ if (emojiBtn) {
 if (emojiSearch) {
   emojiSearch.addEventListener('input', () => renderEmojiGrid(emojiSearch.value));
   emojiSearch.addEventListener('click', e => e.stopPropagation());
+}
+if (emojiPasteInput) {
+  emojiPasteInput.addEventListener('click', e => e.stopPropagation());
+  emojiPasteInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); applyPastedEmoji(); }
+  });
+}
+if (emojiPasteBtn) {
+  emojiPasteBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    applyPastedEmoji();
+  });
+}
+function applyPastedEmoji() {
+  if (!emojiPasteInput) return;
+  const raw = emojiPasteInput.value;
+  const ext = extractFirstEmoji(raw);
+  if (ext) selectEmoji(ext);
+  else if (raw && raw.trim()) selectEmoji(raw.trim().slice(0, 4));
 }
 document.addEventListener('click', (e) => {
   if (!emojiPicker || emojiPicker.hidden) return;
