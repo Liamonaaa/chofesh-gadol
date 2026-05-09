@@ -1,3 +1,12 @@
+// ===== Mobile detection (UA-based) =====
+(function detectMobile() {
+  const ua = navigator.userAgent || '';
+  const isPhone = /Mobi|Android|iPhone|iPod|Opera Mini|IEMobile|BlackBerry|webOS/i.test(ua);
+  // iPad on iOS 13+ identifies as Mac; treat tablet-with-touch as phone too.
+  const isIPad = /iPad/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (isPhone || isIPad) document.body.classList.add('is-mobile');
+})();
+
 // Target: Thursday, June 18, 2026, 00:00 Israel time
 const RELEASE_DATE = new Date('2026-06-18T00:00:00+03:00').getTime();
 const ORIGIN_DATE = new Date('2025-09-01T00:00:00+03:00').getTime(); // school year start as origin
