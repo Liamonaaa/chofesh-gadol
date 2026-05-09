@@ -587,8 +587,7 @@ if (byeForm) {
   });
 }
 
-// ===== Sound hint overlay (first visit) =====
-const SOUND_HINT_KEY = 'chofesh-sound-hint-seen';
+// ===== Sound hint overlay (every page load) =====
 const soundHint = document.getElementById('soundHint');
 const soundHintOk = document.getElementById('shOk');
 const soundHintArrowPath = document.querySelector('.sh-arrow-path');
@@ -597,7 +596,6 @@ function dismissSoundHint() {
   if (!soundHint || soundHint.hidden) return;
   soundHint.hidden = true;
   document.body.classList.remove('sh-active');
-  try { localStorage.setItem(SOUND_HINT_KEY, '1'); } catch {}
 }
 
 function aimArrowAtAudio() {
@@ -627,24 +625,16 @@ function aimArrowAtAudio() {
 }
 
 if (soundHint) {
-  let seen = false;
-  try { seen = localStorage.getItem(SOUND_HINT_KEY) === '1'; } catch {}
-  if (!seen) {
-    soundHint.hidden = false;
-    document.body.classList.add('sh-active');
-    aimArrowAtAudio();
-    window.addEventListener('resize', aimArrowAtAudio);
-    // Dismiss on OK click.
-    if (soundHintOk) soundHintOk.addEventListener('click', dismissSoundHint);
-    // Dismiss on backdrop click.
-    soundHint.querySelector('.sh-backdrop')?.addEventListener('click', dismissSoundHint);
-    // Dismiss when user clicks the audio mute button.
-    document.getElementById('apMute')?.addEventListener('click', dismissSoundHint, { once: false });
-    // Dismiss on Escape.
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && !soundHint.hidden) dismissSoundHint();
-    });
-  }
+  soundHint.hidden = false;
+  document.body.classList.add('sh-active');
+  aimArrowAtAudio();
+  window.addEventListener('resize', aimArrowAtAudio);
+  if (soundHintOk) soundHintOk.addEventListener('click', dismissSoundHint);
+  soundHint.querySelector('.sh-backdrop')?.addEventListener('click', dismissSoundHint);
+  document.getElementById('apMute')?.addEventListener('click', dismissSoundHint, { once: false });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !soundHint.hidden) dismissSoundHint();
+  });
 }
 
 // ===== Sticky mini-bar =====
