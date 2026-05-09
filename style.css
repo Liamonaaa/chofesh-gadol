@@ -785,22 +785,26 @@ a { color: inherit; text-decoration: none; }
 .bye-card.user .bye-icon { filter: none; opacity: 1; }
 .bye-card .bye-remove {
   position: absolute;
-  top: 10px; left: 12px;
-  width: 24px; height: 24px;
+  top: 8px; left: 8px;
+  width: 28px; height: 28px;
   border: none;
-  background: rgba(30, 58, 95, 0.08);
-  color: var(--navy);
+  background: var(--watermelon, #ff4f6b);
+  color: #fff;
   border-radius: 50%;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
+  font-weight: 700;
   line-height: 1;
   display: none;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s, color 0.2s;
+  z-index: 5;
+  box-shadow: 0 2px 8px rgba(255, 79, 107, 0.35);
+  transition: transform 0.15s, box-shadow 0.2s;
 }
 .bye-card.user .bye-remove { display: flex; }
-.bye-card .bye-remove:hover { background: var(--watermelon); color: #fff; }
+.bye-card .bye-remove:hover { transform: scale(1.1); box-shadow: 0 4px 12px rgba(255, 79, 107, 0.55); }
+.bye-card.user .bye-x { display: none; }
 
 .bye-add {
   margin-top: 28px;
