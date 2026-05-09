@@ -487,14 +487,29 @@ a { color: inherit; text-decoration: none; }
   to { background-position: 300% 0%; }
 }
 .marquee-track {
-  display: flex; gap: 40px;
-  white-space: nowrap;
+  direction: ltr;
+  display: flex;
+  width: max-content;
   animation: scroll-x 40s linear infinite;
   font-family: "Fredoka", "Heebo", sans-serif;
   font-weight: 700;
   font-size: 1.6rem;
   color: #fff;
   text-shadow: 2px 3px 0 rgba(0, 0, 0, 0.15);
+  will-change: transform;
+}
+.marquee-set {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  padding-right: 40px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.marquee-set span,
+.marquee-set i {
+  display: inline-block;
+  unicode-bidi: isolate;
 }
 .marquee-track i {
   color: var(--navy);
