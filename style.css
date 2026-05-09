@@ -301,6 +301,53 @@ a { color: inherit; text-decoration: none; }
   display: inline-block;
 }
 
+.mode-switch {
+  display: inline-flex;
+  background: rgba(255, 255, 255, 0.85);
+  border: 2px solid var(--teal);
+  border-radius: 999px;
+  padding: 4px;
+  gap: 4px;
+  margin-bottom: 8px;
+  box-shadow: 0 8px 22px rgba(78, 205, 196, 0.3);
+}
+.mode-btn {
+  font-family: "Heebo", sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 8px 18px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--teal-deep);
+  cursor: pointer;
+  transition: background 0.3s, color 0.3s, transform 0.3s;
+}
+.mode-btn.active {
+  background: var(--teal);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(78, 205, 196, 0.45);
+  transform: translateY(-1px);
+}
+.mode-btn:not(.active):hover { color: var(--watermelon-deep); }
+.mode-hint {
+  font-family: "Caveat", "Heebo", cursive;
+  font-size: 1.1rem;
+  color: var(--teal-deep);
+  margin-bottom: 28px;
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: opacity 0.4s, transform 0.4s;
+  height: 0;
+  overflow: hidden;
+}
+.mode-hint.show {
+  opacity: 0.85;
+  transform: translateY(0);
+  height: auto;
+  margin-bottom: 28px;
+}
+
 .countdown {
   display: flex; justify-content: center; align-items: flex-start;
   gap: 8px;

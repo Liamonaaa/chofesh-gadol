@@ -57,12 +57,18 @@
       <span class="t-2">הגדול</span>
       <span class="hero-stars">✦</span>
     </h1>
-    <p class="tagline">בעוד <span id="bigDays">--</span> ימים בלבד</p>
+    <p class="tagline">בעוד <span id="bigDays">--</span> <span id="bigDaysLabel">ימים</span> בלבד</p>
+
+    <div class="mode-switch" role="tablist" aria-label="מצב ספירה">
+      <button class="mode-btn active" data-mode="all" type="button">📅 כל הימים</button>
+      <button class="mode-btn" data-mode="school" type="button">🎒 רק ימי לימוד</button>
+    </div>
+    <p class="mode-hint" id="modeHint">בלי שישי, שבת וחגים</p>
 
     <div id="countdown" class="countdown">
       <div class="unit">
         <div class="num-stack"><span class="num" id="days">000</span></div>
-        <span class="label">ימים</span>
+        <span class="label" id="daysLabel">ימים</span>
       </div>
       <span class="sep">:</span>
       <div class="unit">

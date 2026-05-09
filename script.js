@@ -2,14 +2,58 @@
 const RELEASE_DATE = new Date('2026-06-18T00:00:00+03:00').getTime();
 const ORIGIN_DATE = new Date('2025-09-01T00:00:00+03:00').getTime(); // school year start as origin
 
+// Israeli school holidays (no school) within the school year window.
+// Format: 'YYYY-MM-DD' in Israel local time.
+const SCHOOL_HOLIDAYS = new Set([
+  // 5786 (2025-2026) - covering school days that fall mid-week
+  '2025-09-23', '2025-09-24', // ראש השנה
+  '2025-10-02',               // יום כיפור
+  '2025-10-07', '2025-10-08', // סוכות + שמיני עצרת
+  '2025-10-09', '2025-10-10', // חוה"מ סוכות
+  '2025-10-13', '2025-10-14', // שמחת תורה + איסרו חג
+  '2025-12-15', '2025-12-16', '2025-12-17', '2025-12-18', // חנוכה (חלק)
+  '2026-03-03',               // פורים
+  '2026-04-02', '2026-04-08', // פסח
+  '2026-04-03', '2026-04-06', '2026-04-07', // חוה"מ פסח
+  '2026-04-21',               // יום הזיכרון
+  '2026-04-22',               // יום העצמאות
+  '2026-05-21', '2026-05-22', // ערב שבועות + שבועות
+]);
+
 const $ = id => document.getElementById(id);
+
+let mode = localStorage.getItem('chofesh-mode') || 'all';
 
 const els = {
   d: $('days'), h: $('hours'), m: $('minutes'), s: $('seconds'),
   md: $('mDays'), mh: $('mHours'), mm: $('mMinutes'), ms: $('mSeconds'),
   bigDays: $('bigDays'),
+  bigDaysLabel: $('bigDaysLabel'),
+  daysLabel: $('daysLabel'),
+  modeHint: $('modeHint'),
   pf: $('progressFill'), pl: $('progressLabel'),
 };
+
+function isoDate(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+// Count school days strictly between now-day and release day (Sun-Thu, not in holiday set).
+function countSchoolDays(nowMs, targetMs) {
+  if (targetMs <= nowMs) return 0;
+  const cur = new Date(nowMs);
+  cur.setHours(0, 0, 0, 0);
+  cur.setDate(cur.getDate() + 1); // start counting from tomorrow
+  const end = new Date(targetMs);
+  end.setHours(0, 0, 0, 0);
+  let count = 0;
+  while (cur <= end) {
+    const dow = cur.getDay(); // 0 Sun..6 Sat
+    if (dow !== 5 && dow !== 6 && !SCHOOL_HOLIDAYS.has(isoDate(cur))) count++;
+    cur.setDate(cur.getDate() + 1);
+  }
+  return count;
+}
 
 const prev = { d: -1, h: -1, m: -1, s: -1 };
 const pad = (n, w = 2) => String(Math.max(0, n)).padStart(w, '0');
@@ -45,16 +89,18 @@ function tick() {
   const m = Math.floor(diff / MIN); diff -= m * MIN;
   const s = Math.floor(diff / SEC);
 
-  setNum(els.d, d, 'd', 3);
+  const dShown = mode === 'school' ? countSchoolDays(now, RELEASE_DATE) : d;
+
+  setNum(els.d, dShown, 'd', 3);
   setNum(els.h, h, 'h');
   setNum(els.m, m, 'm');
   setNum(els.s, s, 's');
 
-  if (els.md) els.md.textContent = pad(d, 3);
+  if (els.md) els.md.textContent = pad(dShown, 3);
   if (els.mh) els.mh.textContent = pad(h);
   if (els.mm) els.mm.textContent = pad(m);
   if (els.ms) els.ms.textContent = pad(s);
-  if (els.bigDays) els.bigDays.textContent = d;
+  if (els.bigDays) els.bigDays.textContent = dShown;
 
   const total = RELEASE_DATE - ORIGIN_DATE;
   const elapsed = Date.now() - ORIGIN_DATE;
@@ -74,6 +120,29 @@ scheduleTick();
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden) tick();
 });
+
+// ===== Mode switch (all days vs school days) =====
+function applyMode() {
+  const schoolLabel = 'ימי לימוד';
+  const allLabel = 'ימים';
+  const lbl = mode === 'school' ? schoolLabel : allLabel;
+  if (els.daysLabel) els.daysLabel.textContent = lbl;
+  if (els.bigDaysLabel) els.bigDaysLabel.textContent = lbl;
+  if (els.modeHint) els.modeHint.classList.toggle('show', mode === 'school');
+  document.querySelectorAll('.mode-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.mode === mode);
+  });
+  prev.d = -1; // force re-render of days flip animation
+  tick();
+}
+document.querySelectorAll('.mode-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    mode = btn.dataset.mode;
+    localStorage.setItem('chofesh-mode', mode);
+    applyMode();
+  });
+});
+applyMode();
 
 // ===== Sticky mini-bar =====
 const miniBar = document.getElementById('miniBar');
