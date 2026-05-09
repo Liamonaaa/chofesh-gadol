@@ -14,6 +14,21 @@
 </head>
 <body>
 
+<!-- Hidden audio player (YouTube) -->
+<div class="audio-hidden" aria-hidden="true">
+  <div id="ytPlayer"></div>
+</div>
+
+<!-- Audio control panel -->
+<div class="audio-panel" id="audioPanel" data-muted="true">
+  <button class="ap-mute" id="apMute" type="button" aria-label="הפעל / השתק שיר">
+    <svg class="ic-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4V5z"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+    <svg class="ic-sound" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+  </button>
+  <input type="range" min="0" max="100" value="55" id="apVolume" class="ap-volume" aria-label="עוצמת קול" />
+  <span class="ap-label">🎵 שיר קיץ</span>
+</div>
+
 <!-- Animated sky background layers -->
 <div class="sky" aria-hidden="true">
   <div class="sun"></div>
@@ -152,5 +167,6 @@
 </footer>
 
 <script src="script.js"></script>
+<script src="audio.js"></script>
 </body>
 </html>
