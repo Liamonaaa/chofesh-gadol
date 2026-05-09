@@ -1050,26 +1050,6 @@ a { color: inherit; text-decoration: none; }
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
 }
-.sh-arrow {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  filter: drop-shadow(0 8px 18px rgba(255, 107, 157, 0.45));
-}
-.sh-arrow-path {
-  stroke-dasharray: 700;
-  stroke-dashoffset: 700;
-  animation: shDraw 1.2s ease-out 0.3s forwards, shPulse 1.6s ease-in-out 1.5s infinite;
-}
-@keyframes shDraw {
-  to { stroke-dashoffset: 0; }
-}
-@keyframes shPulse {
-  0%, 100% { opacity: 1; transform: translateY(0); }
-  50% { opacity: 0.7; transform: translateY(8px); }
-}
 @keyframes shFadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -1133,17 +1113,22 @@ a { color: inherit; text-decoration: none; }
 }
 .sh-ok:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(255, 107, 157, 0.6); }
 .sh-ok:active { transform: translateY(0); }
+.sh-skip {
+  display: block;
+  margin: 14px auto 0;
+  background: transparent;
+  border: none;
+  color: var(--navy);
+  font-family: "Heebo", sans-serif;
+  font-size: 0.9rem;
+  opacity: 0.6;
+  cursor: pointer;
+  padding: 6px 14px;
+  border-radius: 999px;
+  transition: opacity 0.2s, background 0.2s;
+}
+.sh-skip:hover { opacity: 1; background: rgba(30, 58, 95, 0.06); }
 
-/* Highlight pulse on the audio panel while hint is visible. */
-.sound-hint ~ .audio-panel,
-body.sh-active .audio-panel {
-  z-index: 95;
-  animation: shAudioPulse 1.4s ease-in-out infinite;
-}
-@keyframes shAudioPulse {
-  0%, 100% { box-shadow: 0 12px 30px rgba(255, 107, 157, 0.5), 0 0 0 0 rgba(255, 107, 157, 0.6); transform: scale(1); }
-  50% { box-shadow: 0 12px 30px rgba(255, 107, 157, 0.7), 0 0 0 18px rgba(255, 107, 157, 0); transform: scale(1.06); }
-}
 
 @media (max-width: 720px) {
   .sh-card { padding: 24px 22px 22px; }

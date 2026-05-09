@@ -14,22 +14,15 @@
 </head>
 <body>
 
-<!-- First-visit sound hint overlay -->
+<!-- Sound hint overlay -->
 <div class="sound-hint" id="soundHint" hidden>
   <div class="sh-backdrop"></div>
-  <svg class="sh-arrow" viewBox="0 0 600 600" aria-hidden="true" preserveAspectRatio="none">
-    <defs>
-      <marker id="shHead" viewBox="0 0 12 12" refX="6" refY="6" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
-        <path d="M0,0 L12,6 L0,12 L3,6 Z" fill="#FF6B9D"/>
-      </marker>
-    </defs>
-    <path class="sh-arrow-path" d="M 320 240 Q 220 380 120 520" fill="none" stroke="#FF6B9D" stroke-width="10" stroke-linecap="round" marker-end="url(#shHead)"/>
-  </svg>
   <div class="sh-card" role="dialog" aria-labelledby="shTitle">
     <div class="sh-emoji">🎵</div>
-    <h2 id="shTitle" class="sh-title">תדליק את השיר!</h2>
-    <p class="sh-text">לחץ על הכפתור הוורוד למטה כדי להפעיל את שיר הקיץ 🌞</p>
-    <button class="sh-ok" type="button" id="shOk">הבנתי, יאללה</button>
+    <h2 id="shTitle" class="sh-title">בא לך לשמוע מוזיקה?</h2>
+    <p class="sh-text">לחץ למטה והשיר הקייצי יתחיל לנגן 🌞</p>
+    <button class="sh-ok" type="button" id="shOk">🔊 הדלק שיר</button>
+    <button class="sh-skip" type="button" id="shSkip">לא תודה</button>
   </div>
 </div>
 
