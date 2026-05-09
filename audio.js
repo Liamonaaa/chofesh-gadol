@@ -10,7 +10,7 @@ const volSlider = document.getElementById("apVolume");
 let player = null;
 let ready = false;
 let volume = parseInt(localStorage.getItem(VOL_KEY) ?? "55", 10);
-let unmuted = true; // intent; browsers will keep it muted until first gesture
+let unmuted = false; // start muted to satisfy autoplay; user clicks to enable sound
 
 if (volSlider) volSlider.value = volume;
 if (panel) panel.dataset.muted = "true";
@@ -31,6 +31,7 @@ function initPlayer() {
     videoId: VIDEO_ID,
     playerVars: {
       autoplay: 1,
+      mute: 1,
       controls: 0,
       start: START_SEC,
       playsinline: 1,
@@ -76,14 +77,12 @@ function applyState() {
 }
 
 muteBtn?.addEventListener("click", () => {
-  // First click after page load: state may already be unmuted but player
-  // is silent because of autoplay policy. Apply state instead of toggling.
-  if (unmuted && isPlayerMuted()) {
-    applyState();
-    return;
-  }
   unmuted = !unmuted;
   applyState();
+  // Make sure playback is going (autoplay may have paused on some browsers).
+  if (player && ready) {
+    try { player.playVideo(); } catch {}
+  }
 });
 
 volSlider?.addEventListener("input", () => {
